@@ -6,6 +6,7 @@ import {
   ensurePathInEnv,
   runChildProcess,
 } from "@paperclipai/adapter-utils/server-utils";
+import { models as staticModels } from "../index.js";
 
 const MODELS_CACHE_TTL_MS = 60_000;
 const MODELS_DISCOVERY_TIMEOUT_MS = 20_000;
@@ -187,10 +188,20 @@ export async function ensureOpenCodeModelConfiguredAndAvailable(input: {
     throw new Error("OpenCode returned no models. Run `opencode models` and verify provider auth.");
   }
 
-  if (!models.some((entry) => entry.id === model)) {
-    const sample = models.slice(0, 12).map((entry) => entry.id).join(", ");
+  // Also accept models from the static list (e.g. OpenRouter free models)
+  const allKnownModels = [...models];
+  const knownIds = new Set(models.map((m) => m.id));
+  for (const sm of staticModels) {
+    if (!knownIds.has(sm.id)) {
+      allKnownModels.push(sm);
+      knownIds.add(sm.id);
+    }
+  }
+
+  if (!allKnownModels.some((entry) => entry.id === model)) {
+    const sample = allKnownModels.slice(0, 12).map((entry) => entry.id).join(", ");
     throw new Error(
-      `Configured OpenCode model is unavailable: ${model}. Available models: ${sample}${models.length > 12 ? ", ..." : ""}`,
+      `Configured OpenCode model is unavailable: ${model}. Available models: ${sample}${allKnownModels.length > 12 ? ", ..." : ""}`,
     );
   }
 
@@ -199,9 +210,18 @@ export async function ensureOpenCodeModelConfiguredAndAvailable(input: {
 
 export async function listOpenCodeModels(): Promise<AdapterModel[]> {
   try {
-    return await discoverOpenCodeModelsCached();
+    const discovered = await discoverOpenCodeModelsCached();
+    // Merge static models (including OpenRouter free models) with discovered models
+    const merged = [...discovered];
+    const discoveredIds = new Set(discovered.map((m) => m.id));
+    for (const model of staticModels) {
+      if (!discoveredIds.has(model.id)) {
+        merged.push(model);
+      }
+    }
+    return sortModels(merged);
   } catch {
-    return [];
+    return sortModels([...staticModels]);
   }
 }
 

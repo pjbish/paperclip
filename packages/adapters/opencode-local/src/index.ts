@@ -9,6 +9,16 @@ export const models: Array<{ id: string; label: string }> = [
   { id: "openai/gpt-5.2", label: "openai/gpt-5.2" },
   { id: "openai/gpt-5.1-codex-max", label: "openai/gpt-5.1-codex-max" },
   { id: "openai/gpt-5.1-codex-mini", label: "openai/gpt-5.1-codex-mini" },
+  // OpenRouter free models
+  { id: "openrouter/auto", label: "openrouter/auto (free router)" },
+  { id: "google/gemma-3-1b-it:free", label: "google/gemma-3-1b-it:free" },
+  { id: "minimax/minimax-m2.5:free", label: "minimax/minimax-m2.5:free" },
+  { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "nvidia/nemotron-3-super-120b-a12b:free" },
+  { id: "qwen/qwen3.6-plus:free", label: "qwen/qwen3.6-plus:free" },
+  { id: "stepfun/step-3.5-flash:free", label: "stepfun/step-3.5-flash:free" },
+  { id: "arcee-ai/trinity-large-preview:free", label: "arcee-ai/trinity-large-preview:free" },
+  { id: "liquid/lfm-2.5-1.2b-instruct:free", label: "liquid/lfm-2.5-1.2b-instruct:free" },
+  { id: "liquid/lfm-2.5-1.2b-thinking:free", label: "liquid/lfm-2.5-1.2b-thinking:free" },
 ];
 
 export const agentConfigurationDoc = `# opencode_local agent configuration
