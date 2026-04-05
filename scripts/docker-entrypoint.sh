@@ -24,4 +24,25 @@ if [ -n "$GH_TOKEN" ]; then
     echo "Git credential helper configured (gh auth)"
 fi
 
+# Configure Xero MCP server for OpenCode agents when Xero credentials are available
+if [ -n "$XERO_CLIENT_ID" ] && [ -n "$XERO_CLIENT_SECRET" ]; then
+    mkdir -p /paperclip/.config/opencode
+    cat > /paperclip/.config/opencode/opencode.json <<XEOF
+{
+  "mcp": {
+    "xero": {
+      "type": "local",
+      "command": ["npx", "-y", "github:pjbish/xero-mcp-server"],
+      "environment": {
+        "XERO_CLIENT_ID": "${XERO_CLIENT_ID}",
+        "XERO_CLIENT_SECRET": "${XERO_CLIENT_SECRET}"
+      }
+    }
+  }
+}
+XEOF
+    chown -R node:node /paperclip/.config
+    echo "Xero MCP server configured for OpenCode agents"
+fi
+
 exec gosu node "$@"
