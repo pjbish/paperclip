@@ -55,9 +55,13 @@ ARG USER_GID=1000
 WORKDIR /app
 COPY --chown=node:node --from=build /app /app
 RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest opencode-ai \
-  && pip install --break-system-packages hermes-agent \
   && mkdir -p /paperclip /paperclip/.hermes \
   && chown -R node:node /paperclip
+
+# Install Hermes Agent from source (requires git clone + pip)
+RUN pip install --break-system-packages uv \
+  && uv pip install --system --python python3 "hermes-agent @ git+https://github.com/NousResearch/hermes-agent.git" \
+  || echo "WARN: hermes-agent install failed, hermes_local adapter will not work"
 
 COPY scripts/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
