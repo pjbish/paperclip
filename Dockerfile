@@ -58,9 +58,10 @@ RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/cod
   && mkdir -p /paperclip /paperclip/.hermes \
   && chown -R node:node /paperclip
 
-# Install Hermes Agent from source (requires git clone + pip)
-RUN pip install --break-system-packages uv \
-  && uv pip install --system --python python3 "hermes-agent @ git+https://github.com/NousResearch/hermes-agent.git" \
+# Install Hermes Agent from source into a venv, symlink the CLI to PATH
+RUN python3 -m venv /opt/hermes-venv \
+  && /opt/hermes-venv/bin/pip install "hermes-agent @ git+https://github.com/NousResearch/hermes-agent.git" \
+  && ln -sf /opt/hermes-venv/bin/hermes /usr/local/bin/hermes \
   || echo "WARN: hermes-agent install failed, hermes_local adapter will not work"
 
 COPY scripts/docker-entrypoint.sh /usr/local/bin/
