@@ -24,25 +24,24 @@ if [ -n "$GH_TOKEN" ]; then
     echo "Git credential helper configured (gh auth)"
 fi
 
-# Configure Xero MCP server for OpenCode agents when Xero credentials are available
-if [ -n "$XERO_CLIENT_ID" ] && [ -n "$XERO_CLIENT_SECRET" ]; then
+# Configure Composio MCP gateway for all agents (Notion, Xero, etc.)
+if [ -n "$COMPOSIO_API_KEY" ]; then
     mkdir -p /paperclip/.config/opencode
     cat > /paperclip/.config/opencode/opencode.json <<XEOF
 {
   "mcp": {
-    "xero": {
-      "type": "local",
-      "command": ["npx", "-y", "github:pjbish/xero-mcp-server"],
-      "environment": {
-        "XERO_CLIENT_ID": "${XERO_CLIENT_ID}",
-        "XERO_CLIENT_SECRET": "${XERO_CLIENT_SECRET}"
+    "composio": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp",
+      "headers": {
+        "X-CONSUMER-API-KEY": "${COMPOSIO_API_KEY}"
       }
     }
   }
 }
 XEOF
     chown -R node:node /paperclip/.config
-    echo "Xero MCP server configured for OpenCode agents"
+    echo "Composio MCP gateway configured for agents"
 fi
 
 exec gosu node "$@"
