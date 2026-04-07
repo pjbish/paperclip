@@ -16,7 +16,7 @@ if [ "$(id -g node)" -ne "$PGID" ]; then
 fi
 
 # Always ensure /paperclip is owned by node (Railway volume mounts override build-time ownership)
-chown node:node /paperclip
+chown -R node:node /paperclip
 
 # Ensure Hermes session/config directories exist on the volume
 mkdir -p /paperclip/.hermes/sessions /paperclip/.hermes/skills
@@ -24,7 +24,7 @@ chown -R node:node /paperclip/.hermes
 
 # Configure Git to use GitHub CLI as credential helper when GH_TOKEN is available
 if [ -n "$GH_TOKEN" ]; then
-    gosu node git config --global credential.helper '!gh auth git-credential'
+    gosu node git config --global credential.helper '!gh auth git-credential' || echo "WARN: git config failed (non-fatal)"
     echo "Git credential helper configured (gh auth)"
 fi
 
