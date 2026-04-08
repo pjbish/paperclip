@@ -33,6 +33,19 @@ if [ -n "$COMPOSIO_API_KEY" ]; then
     mkdir -p /paperclip/.config/opencode
     cat > /paperclip/.config/opencode/opencode.json <<XEOF
 {
+  "\$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "openrouter": {
+      "models": {
+        "auto": {
+          "name": "OpenRouter Auto",
+          "max_tokens": 128000,
+          "supports_tool_use": true,
+          "supports_object_generation": true
+        }
+      }
+    }
+  },
   "mcp": {
     "composio": {
       "type": "remote",
