@@ -15,6 +15,17 @@ if [ "$(id -g node)" -ne "$PGID" ]; then
     usermod -g "$PGID" node
 fi
 
+# One-time volume cleanup (remove after Railway migration complete)
+if [ -f /paperclip/.needs-cleanup ] || [ "${PAPERCLIP_CLEANUP_ON_BOOT:-}" = "true" ]; then
+    echo "Cleaning up logs, backups, and run-logs to free disk space..."
+    rm -rf /paperclip/instances/default/logs/* \
+           /paperclip/instances/default/data/backups/* \
+           /paperclip/instances/default/data/run-logs/* \
+           /paperclip/.cache/* 2>/dev/null || true
+    rm -f /paperclip/.needs-cleanup
+    echo "Cleanup complete"
+fi
+
 # Always ensure /paperclip is owned by node (Railway volume mounts override build-time ownership)
 chown -R node:node /paperclip
 
